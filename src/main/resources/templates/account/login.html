@@ -19,15 +19,15 @@
             </div>
             <div class="input-group">
                 <label for="userId">아이디</label>
-                <input type="text" id="userId" placeholder="아이디를 입력하세요" required>
+                <input type="text" id="userId" placeholder="아이디" v-model="user.userId">
             </div>
             <div class="input-group">
-                <label for="password">비밀번호</label>
-                <input type="password" id="password" placeholder="비밀번호를 입력하세요" required>
+                <label for="userPassword">비밀번호</label>
+                <input type="password" id="userPassword" placeholder="비밀번호" v-model="user.userPassword">
             </div>
-            <button class="login-button">로그인</button>
+            <button class="login-button" @click="login()">로그인</button>
             <div class="social-login">
-                <button class="text-[13px] md:text-sm leading-4 bg-naver">
+                <button class="text-[13px] md:text-sm leading-4 bg-naver" @click="naverLogin()">
                     <div class="text-sm sm:text-base me-1.5">
                         <svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1.6 0S0 0 0 1.6v20.8S0 24 1.6 24h20.8s1.6 0 1.6-1.6V1.6S24 0 22.4 0zm3.415 5.6h4.78l4.425 6.458V5.6h4.765v12.8h-4.78L9.78 11.943V18.4H5.015Z"></path>
@@ -35,7 +35,7 @@
                     </div>
                     <span class="flex-1">&nbsp;네이버로 시작하기</span>
                 </button>
-                <button class="text-[13px] md:text-sm leading-4 bg-kakao">
+                <button class="text-[13px] md:text-sm leading-4 bg-kakao" @click="kakaoLogin()">
                     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" class="text-sm sm:text-base me-1.5" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                         <g>
                             <path fill="none" d="M0 0h24v24H0z"></path>
@@ -46,7 +46,7 @@
                 </button>
             </div>
             <div class="footer-links">
-                <a href="#">회원가입</a>
+                <a href="/join">계정이 없으신가요?</a>
             </div>
         </div>
     </div>
@@ -60,6 +60,35 @@
 <script>
     $(function() {
         $('#header-container').load('/common/html/header.html');
+    });
+</script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            user : {
+                userId : "",
+                userPassword : ""
+            }
+        },
+        methods : {
+            login : function () {
+                let vm = this;
+
+            },
+            naverLogin : function () {
+                let vm = this;
+            },
+            kakao.Login : function () {
+                let vm = this;
+            }
+        },
+        created() {
+
+        },
+        mounted() {
+
+        }
     });
 </script>
 </body>

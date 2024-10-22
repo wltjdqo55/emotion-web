@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="/common/css/body.css">
+    <link rel="stylesheet" href="/common/css/header.css">
+    <link rel="stylesheet" href="/css/join.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<div id="app">
+    <div id="header-container"></div>
+    <div class="content">
+        <form>
+            <div class="form-container">
+                <!-- 입력 필드 -->
+                <h2 class="form-title">회원가입</h2>
+                <div class="form-group">
+                    <label for="userId" class="form-label">아이디</label>
+                    <div class="input-container">
+                        <input type="text" id="userId" name="userId" placeholder="4~20자리/영문, 숫자, 특수문자'_'사용가능" @input="idCheck" @blur="checkId" @focus="idFocusIn" maxlength="30" v-model="user.userId">
+                    </div>
+                    <div v-if="check.checkIdMessage!=''">
+                        <span class="checkIdMessage-span">{{ check.checkIdMessage }}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword" class="form-label">비밀번호</label>
+                    <div class="input-container">
+                        <input type="password" id="userPassword" name="userPassword" placeholder="8~16자리/영문 대소문자, 숫자, 특수문자 조합" @input="passwordCheck" maxlength="30" v-model="user.userPassword">
+                    </div>
+                    <div v-if="check.checkIdMessage!=''">
+                        <span class="checkPasswordMessage-span">{{ check.checkPasswordMessage }}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="userName" class="form-label">이름</label>
+                    <div class="input-container">
+                        <input type="text" id="userName" name="userName" placeholder="이름입력" maxlength="30" @input="nameCheck" v-model="user.userName">
+                    </div>
+                    <div v-if="check.checkNameMessage!=''">
+                        <span class="checkNameMessage-span">{{ check.checkNameMessage }}</span>
+                    </div>
+                </div>
+                <!-- 버튼 그룹 -->
+                <div class="button-group">
+                    <button type="button" class="btn-primary" @click="join()" :disabled="!(check.checkIdMessage == '사용가능한 ID입니다.' && check.checkPasswordMessage == '비밀번호가 안전합니다.' && check.checkNameMessage == '유효한 이름입니다.')">회원가입 완료</button>
+                </div>
+                <div class="footer-links">
+                    <a href="/login">이미 계정이 있으신가요?</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/plugins/vueJs/vue.js"></script>
+<script type="text/javascript" src="/plugins/axios/axios.min.js"></script>
+<script src="/dist/jquery/jquery.js"></script>
+<script src="/dist/jquery/jquery.min.js"></script>
+<script src="/dist/js/toggles-list-filter.js"></script>
+<script src="/dist/js/vueCommon.js"></script>
+<script>
+  $(function() {
+      $('#header-container').load('/common/html/header.html');
+  });
+</script>
+<script>
+  new Vue({
+      el: '#app',
+      data: {
+          user : {
+              userId : "",
+              userPassword : "",
+              userName : ""
+          },
+          check : {
+              checkIdMessage : "",
+              checkPasswordMessage : "",
+              checkNameMessage : ""
+          }
+      },
+      methods : {
+        join : function () {
+            let vm = this;
+            let formData = new FormData();
+            Object.keys(vm.user).forEach((key) => {
+                if(vm.user[key]==null){
+                    formData.append(key, "");
+                }
+                else{
+                    formData.append(key, vm.user[key]);
+                }
+            })
+            axios.post('/account/userAdd', formData)
+            .then(res => {
+                if( res.data != null ) {
+                    alert("회원가입이 완료되었습니다.");
+                    location.href = "/login";
+                } else {
+                    alert("알 수 없는 이유로 실패하였습니다.");
+                }
+            }).
+            catch(error => {
+                console.log("요청 실패");
+            })
+        },
+        idCheck : function () {
+            let vm = this;
+            vm.check.checkIdMessage = "4~20자리/영문, 숫자, 특수문자'_'만 사용해주세요.";
+        },
+        spanMessage: function (spanClassName, color) {
+            $('.' + spanClassName).css('color', color);
+        },
+        passwordCheck : function () {
+            let vm = this;
+            if( vm.user.userPassword.length < 8 || vm.user.userPassword.length > 16 ) {
+                vm.check.checkPasswordMessage = "8~16자리 영문 대소문자, 숫자, 특수문자 중 3가지 이상 조합으로 만들어주세요.";
+                vm.spanMessage("checkPasswordMessage-span", "red");
+            } else {
+                let hasUpperCase = /[A-Z]/.test(vm.user.userPassword);
+                let hasLowerCase = /[a-z]/.test(vm.user.userPassword);
+                let hasNumbers = /[0-9]/.test(vm.user.userPassword);
+                let hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(vm.user.userPassword);
+
+                let criteriaCount = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChars].filter(Boolean).length;
+
+                // 조합이 3가지 이상인지 체크
+                if (criteriaCount < 3) {
+                    vm.check.checkPasswordMessage = "영문 대소문자, 숫자, 특수문자 중 3가지 이상 조합으로 만들어주세요.";
+                    vm.spanMessage("checkPasswordMessage-span", "red");
+                } else {
+                    vm.check.checkPasswordMessage = "비밀번호가 안전합니다.";
+                    vm.spanMessage("checkPasswordMessage-span", "blue");
+                }
+            }
+        },
+        nameCheck : function () {
+            let vm = this;
+            let nameRegex = /^[가-힣a-zA-Z]+$/; // 한글 및 영문만 허용 (공백 제외)
+            let nameLength = vm.user.userName.length;
+
+            if (nameLength < 2 || nameLength > 50) {
+                vm.check.checkNameMessage = "이름은 2자 이상 50자 이하로 입력해주세요.";
+                vm.spanMessage("checkNameMessage-span", "red");
+            } else if (!nameRegex.test(vm.user.userName)) {
+                vm.check.checkNameMessage = "이름은 한글 또는 영문만 사용할 수 있습니다.";
+                vm.spanMessage("checkNameMessage-span", "red");
+            } else {
+                vm.check.checkNameMessage = "유효한 이름입니다.";
+                vm.spanMessage("checkNameMessage-span", "blue");
+            }
+        },
+        checkId : function () {
+            let vm = this;
+            axios.get("/account/userIdCheck", {
+                params : {
+                    userId : vm.user.userId
+                }
+            })
+            .then(res => {
+                if ( res.data ) {
+                    vm.check.checkIdMessage = "사용가능한 ID입니다.";
+                    vm.spanMessage("checkIdMessage-span", "blue");
+                } else {
+                    vm.check.checkIdMessage = "이미 사용중인 ID입니다.";
+                    vm.spanMessage("checkIdMessage-span", "red");
+                }
+            })
+            .catch(error => {
+                console.log("호출실패");
+            })
+        },
+        idFocusIn : function () {
+            let vm = this;
+            vm.spanMessage("checkIdMessage-span", "black");
+        },
+        checkedText: function () {
+            let vm = this;
+            // 각 메시지가 모두 비어있거나 유효하지 않으면 false 반환
+            if (vm.check.checkIdMessage !== "" && vm.check.checkIdMessage !== "4~20자리/영문, 숫자, 특수문자'_'만 사용해주세요." && vm.check.checkIdMessage !== "이미 사용중인 ID입니다." &&
+                vm.check.checkPasswordMessage !== "" && vm.check.checkPasswordMessage !== "8~16자리 영문 대소문자, 숫자, 특수문자 중 3가지 이상 조합으로 만들어주세요." && vm.check.checkPasswordMessage !== "영문 대소문자, 숫자, 특수문자 중 3가지 이상 조합으로 만들어주세요." &&
+                vm.check.checkNameMessage !== "" && vm.check.checkNameMessage !== "이름은 2자 이상 50자 이하로 입력해주세요." && vm.check.checkNameMessage !== "이름은 한글 또는 영문만 사용할 수 있습니다.") {
+                return false; // 모든 조건이 유효하면 false 반환
+            }
+            return true; // 조건에 맞지 않으면 true 반환
+        }
+      },
+      created() {
+
+      },
+      mounted() {
+
+      }
+  });
+</script>
+</body>
+</html>

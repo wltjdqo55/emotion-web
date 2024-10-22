@@ -71,7 +71,7 @@
                 userPassword : ""
             }
         },
-        methods : {
+        methods : $.extend({}, vueMethods,{
             login : function () {
                 let vm = this;
                 let formData = new FormData();
@@ -107,7 +107,7 @@
 
         },
         mounted() {
-
+            this.getUserInfo();
         }
     });
 </script>

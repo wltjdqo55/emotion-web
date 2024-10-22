@@ -80,7 +80,7 @@
               checkNameMessage : ""
           }
       },
-      methods : {
+      methods : $.extend({}, vueMethods,{
         join : function () {
             let vm = this;
             let formData = new FormData();
@@ -153,6 +153,11 @@
         },
         checkId : function () {
             let vm = this;
+            if(vm.user.userId=="" || vm.user.userId.length < 4 || !/^[a-zA-Z0-9_]+$/.test(vm.user.userId)) {
+                vm.check.checkIdMessage = "4~20자리/영문, 숫자, 특수문자'_'만 사용해주세요.";
+                vm.spanMessage("checkIdMessage-span", "red")
+                return false;
+            }
             axios.get("/account/userIdCheck", {
                 params : {
                     userId : vm.user.userId
@@ -190,7 +195,7 @@
 
       },
       mounted() {
-
+        this.getUserInfo();
       }
   });
 </script>

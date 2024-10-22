@@ -62,6 +62,25 @@
         $('#header-container').load('/common/html/header.html');
     });
 </script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            user : {
+                userName : ""
+            },
+            isUser : false
+        },
+        methods : $.extend({}, vueMethods,{
 
+        }),
+        created() {
+
+        },
+        mounted() {
+            this.getUserInfo();
+        }
+    });
+</script>
 </body>
 </html>

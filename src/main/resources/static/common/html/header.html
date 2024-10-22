@@ -1,11 +1,14 @@
 <div class="header" id="headerApp">
-    <div class="logo">
+    <div class="logo" @click="mainPage()">
         <span class="emotion">Emotion</span>&nbsp;
         <span class="hub" style="color:black">Hub</span>
     </div>
     <nav class="navbar">
         <ul>
-            <li class="account" v-if="isLoggedIn" @click="myPage()">
+            <li class="account" v-if="isUser">
+                {{ user.userName }} 님 <!-- 사용자 아이콘 -->
+            </li>
+            <li class="account" @click="myPage()">
                 <i class="fas fa-user"></i>&nbsp; 내 계정 <!-- 사용자 아이콘 -->
             </li>
         </ul>
@@ -18,22 +21,42 @@
         el: '#headerApp',
         data: {
             isLoggedIn : true,
-            user : {
-                name : ""
-            }
+            user : {},
+            isUser : false
         },
         methods : {
             myPage : function () {
-                if ( this.isLoggedIn ) {
+                if ( this.isUser ) {
+                    location.href = "/";    //마이페이지
+                } else {
                     location.href = "/login";
                 }
-            }
+            },
+            mainPage : function () {
+                if(vm.mainPage)
+                location.href = "/main";
+            },
+            sessionCheck : function () {
+                let vm = this;
+                axios.get('/account/sessionCheck')
+                    .then(res => {
+                        if(res.data){
+                            vm.isUser = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching data: ", error);
+                    })
+            },
         },
         created() {
-
+            let storedUserInfo = localStorage.getItem('userInfo');
+            if (storedUserInfo) {
+                this.user = JSON.parse(storedUserInfo);
+            }
         },
         mounted() {
-
+            this.sessionCheck();
         }
     });
 </script>

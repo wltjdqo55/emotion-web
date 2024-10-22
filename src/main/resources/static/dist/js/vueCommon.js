@@ -29,17 +29,17 @@ const vueFilters = {
 };
 
 const vueMethods = {
-    getAdminInfo : function () {
+    getUserInfo : function () {
         let vm = this;
-        axios.get('/account/getAdminInfo')
+        axios.get('/account/getUserInfo')
             .then(res => {
-                vm.adminInfo = res.data;
-                if(vm.adminInfo.length < 1) {
-                    vm.isAdmin = false;
+                vm.user = res.data;
+                if(vm.user.length < 1) {
+                    vm.isUser = false;
                 }
                 else{
-                    localStorage.setItem('adminInfo', JSON.stringify(vm.adminInfo));
-                    vm.isAdmin = true;
+                    localStorage.setItem('userInfo', JSON.stringify(vm.user));
+                    vm.isUser = true;
                 }
             })
             .catch(error => {

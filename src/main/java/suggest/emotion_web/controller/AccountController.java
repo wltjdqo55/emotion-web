@@ -3,6 +3,7 @@ package suggest.emotion_web.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -44,4 +45,21 @@ public class AccountController {
     }
     return false;
   }
+
+  @GetMapping("/account/getUserInfo")
+  @ResponseBody
+  public UserDTO getUserInfo (Model model, HttpSession session) {
+    if( session.getAttribute("userInfo") != null) {
+      System.out.println("@@@@@@@@@@");
+      return (UserDTO) session.getAttribute("userInfo");
+    }
+    return null;
+  }
+
+  @GetMapping("/account/sessionCheck")
+  @ResponseBody
+  public boolean sessionCheck(HttpSession session) {
+    return session.getAttribute("userInfo") != null;
+  }
+
 }

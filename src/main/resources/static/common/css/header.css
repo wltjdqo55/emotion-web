@@ -1,0 +1,46 @@
+.logo {
+    display: flex;
+    align-items: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2em;
+    color: #ff6f20;
+    font-weight: bold;
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.navbar {
+    flex: 1; /* 전체 너비를 차지 */
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin: 0;
+    padding: 0;
+}
+
+.navbar ul li {
+    color: #333;
+    font-size: 1.3em;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 20px; /* 항목 패딩 추가 */
+}
+
+.account {
+    padding: 10px 20px; /* 내 계정 항목 패딩 추가 */
+}

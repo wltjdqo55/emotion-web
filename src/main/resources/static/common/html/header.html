@@ -1,0 +1,39 @@
+<div class="header" id="headerApp">
+    <div class="logo">
+        <span class="emotion">Emotion</span>&nbsp;
+        <span class="hub" style="color:black">Hub</span>
+    </div>
+    <nav class="navbar">
+        <ul>
+            <li class="account" v-if="isLoggedIn" @click="myPage()">
+                <i class="fas fa-user"></i>&nbsp; 내 계정 <!-- 사용자 아이콘 -->
+            </li>
+        </ul>
+    </nav>
+</div>
+<script src="/plugins/vueJs/vue.js"></script>
+<script type="text/javascript" src="/plugins/axios/axios.min.js"></script>
+<script>
+    new Vue({
+        el: '#headerApp',
+        data: {
+            isLoggedIn : true,
+            user : {
+                name : ""
+            }
+        },
+        methods : {
+            myPage : function () {
+                if ( this.isLoggedIn ) {
+                    location.href = "/login";
+                }
+            }
+        },
+        created() {
+
+        },
+        mounted() {
+
+        }
+    });
+</script>

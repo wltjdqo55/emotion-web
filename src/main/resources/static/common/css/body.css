@@ -1,0 +1,6 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;  /* 기본 마진 제거 */
+    padding: 0;  /* 기본 패딩 제거 */
+    color: #333;  /* 글씨 색상 조정 */
+}

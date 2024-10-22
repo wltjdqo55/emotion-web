@@ -74,12 +74,32 @@
         methods : {
             login : function () {
                 let vm = this;
-
+                let formData = new FormData();
+                Object.keys(vm.user).forEach((key) => {
+                    if(vm.user[key]==null){
+                        formData.append(key, "");
+                    }
+                    else{
+                        formData.append(key, vm.user[key]);
+                    }
+                })
+                axios.post('/account/loginCheck', formData)
+                    .then(res => {
+                        if( res.data ) {
+                            location.href = "/main";
+                        } else {
+                            alert ("아이디 또는 비밀번호가 일치하지 않습니다.");
+                            return false;
+                        }
+                    })
+                    .catch(error => {
+                        console.log("로그요청 실패")
+                    })
             },
             naverLogin : function () {
                 let vm = this;
             },
-            kakao.Login : function () {
+            kakaoLogin : function () {
                 let vm = this;
             }
         },

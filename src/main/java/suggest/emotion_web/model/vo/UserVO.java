@@ -14,4 +14,9 @@ public class UserVO {
   private String userPassword;
 
   private String userName;
+
+  public UserVO(String userId, String userName) {
+    this.userId = userId;
+    this.userName = userName;
+  }
 }

@@ -38,6 +38,7 @@ public class AccountController {
   @PostMapping("/account/loginCheck")
   @ResponseBody
   public boolean loginCheck (UserVO userVO, HttpSession session) {
+    System.out.println(userVO);
     UserDTO userDTO = accountService.loginCheck(userVO);
     if(userDTO != null) {
       UserSession.setSession(userDTO, session, 3600);
@@ -50,7 +51,6 @@ public class AccountController {
   @ResponseBody
   public UserDTO getUserInfo (Model model, HttpSession session) {
     if( session.getAttribute("userInfo") != null) {
-      System.out.println("@@@@@@@@@@");
       return (UserDTO) session.getAttribute("userInfo");
     }
     return null;
@@ -62,4 +62,10 @@ public class AccountController {
     return session.getAttribute("userInfo") != null;
   }
 
+  @GetMapping("/account/logout")
+  @ResponseBody
+  public boolean logout(HttpSession session) {
+    UserSession.removeSession("userInfo", session);
+    return !sessionCheck(session);
+  }
 }

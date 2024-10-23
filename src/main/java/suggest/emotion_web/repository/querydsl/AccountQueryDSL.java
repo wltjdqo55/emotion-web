@@ -14,14 +14,25 @@ import suggest.emotion_web.model.vo.UserVO;
 public class AccountQueryDSL {
 
   private final JPAQueryFactory jpaQueryFactory;
+  QUser user = QUser.user;
 
   public User loginCheck (UserVO userVO) {
-    QUser user = QUser.user;
+
     return jpaQueryFactory
         .select(user)
         .from(user)
         .where(
             user.userId.eq(userVO.getUserId()).and(user.userPassword.eq(userVO.getUserPassword()))
+        )
+        .fetchOne();
+  }
+
+  public User findUserInfo (String userId) {
+    return jpaQueryFactory
+        .select(user)
+        .from(user)
+        .where(
+            user.userId.eq(userId)
         )
         .fetchOne();
   }

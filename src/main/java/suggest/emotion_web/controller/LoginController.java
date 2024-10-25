@@ -17,6 +17,7 @@ import suggest.emotion_web.session.UserSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,8 +43,10 @@ public class LoginController {
     System.out.println("code=>" + code);
     System.out.println("state=>" + state);
 
-    UserDTO userDTO = naverLoginService.naverGetToken(code);    // 네이버 토큰 발급
+    // 네이버 토큰 발급
+    UserDTO userDTO = naverLoginService.naverGetToken(code);
 
+    // 세션 등록
     if(userDTO != null) {
       UserSession.setSession(userDTO, session, 3600);
     }
@@ -67,10 +70,23 @@ public class LoginController {
 
   //카카오 로그인시 콜백 URL
   @GetMapping("/kakao/login/callback")
-  public String kakaoCallback(@RequestParam("code") String code, HttpServletRequest request) throws JsonProcessingException{
-    System.out.println("!!!!");
-    System.out.println(code);
-    // 나머지 처리 로직
+  public String kakaoCallback(@RequestParam("code") String code, HttpSession session) throws Exception {
+    System.out.println("code=>" + code);
+
+    // 토큰 받기
+    String accessToken = kakaoLoginService.getAccessToken(code);
+
+    // 사용자 정보 받기
+    Map<String, Object> userInfo = kakaoLoginService.getUserInfo(accessToken);
+
+    // 회원정보 가져오기
+    UserDTO userDTO = kakaoLoginService.setUserInfo(String.valueOf(userInfo.get("id")), (String) userInfo.get("nickname"));
+
+    // 세션 등록
+    if(userDTO != null) {
+      UserSession.setSession(userDTO, session, 3600);
+    }
+
     return "redirect:/main";
   }
 }

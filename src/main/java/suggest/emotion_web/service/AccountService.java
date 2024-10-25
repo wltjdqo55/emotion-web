@@ -1,6 +1,7 @@
 package suggest.emotion_web.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import suggest.emotion_web.model.dto.UserDTO;
@@ -15,6 +16,7 @@ public class AccountService {
 
   private final AccountRepository accountRepository;
   private final AccountQueryDSL accountQueryDSL;
+  private final BCryptPasswordEncoder encoder;
 
   public boolean idCheck (String userId) {
     return accountRepository.findOneByUserId(userId).isEmpty();
@@ -22,15 +24,16 @@ public class AccountService {
 
   @Transactional
   public UserDTO userAdd (UserVO userVO) {
+    userVO.setUserPassword(encoder.encode(userVO.getUserPassword()));
     return new UserDTO(accountRepository.save(new User(userVO)));
   }
 
   public UserDTO loginCheck (UserVO userVO) {
     User user = accountQueryDSL.loginCheck(userVO);
-    if(user==null) {
-      return null;
+    if(encoder.matches(userVO.getUserPassword(), user.getUserPassword())){
+      return new UserDTO(user);
     }
-    return new UserDTO(user);
+    return null;
   }
 
 }

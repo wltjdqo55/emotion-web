@@ -29,7 +29,7 @@ public class AccountService {
   }
 
   public UserDTO loginCheck (UserVO userVO) {
-    User user = accountQueryDSL.loginCheck(userVO);
+    User user = accountRepository.findOneByUserId(userVO.getUserId()).orElse(new User());
     if(encoder.matches(userVO.getUserPassword(), user.getUserPassword())){
       return new UserDTO(user);
     }

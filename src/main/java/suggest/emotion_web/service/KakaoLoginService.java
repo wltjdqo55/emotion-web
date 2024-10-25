@@ -23,7 +23,7 @@ public class KakaoLoginService {
   private final AccountRepository accountRepository;
   private final AccountQueryDSL accountQueryDSL;
 
-  String client_id = "a3a81da0530ddbe7ab244544fb7d71c8"; // 앱 키
+  String client_id = "a8eda776e6a96137d25561b1e5fe581a"; // 앱 키
   String response_type = "code";  // code로 고정
   String charset = "UTF-8";   // 인코딩 설정
   String redirect_uri = "http://localhost:8080/kakao/login/callback"; // 전달받을 서비스 서버의 URI

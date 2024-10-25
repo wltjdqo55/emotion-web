@@ -26,11 +26,14 @@ public class User {
 
   private LocalDateTime createdDate;
 
+  private String connect;
+
   public User (UserVO userVO) {
     this.userId = userVO.getUserId();
     this.userPassword = userVO.getUserPassword();
     this.userName = userVO.getUserName();
     this.createdDate = LocalDateTime.now();
+    this.connect = userVO.getConnect();
   }
 
 }

@@ -154,8 +154,9 @@ public class NaverLoginService {
     JSONObject response = jsonResponse.getJSONObject("response");
     String userId = response.getString("id");
     String userName = unicodeStr(response.getString("name"));
+    String connect = "naver";
 
-    UserVO userVO = new UserVO(userId, userName);
+    UserVO userVO = new UserVO(userId, userName, connect);
 
     if(accountRepository.findOneByUserId(userId).isEmpty()){  //가입된 정보가 없을 시 계정 새로 등록
       accountRepository.save(new User(userVO));

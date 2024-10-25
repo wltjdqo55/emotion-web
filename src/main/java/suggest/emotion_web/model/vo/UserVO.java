@@ -15,8 +15,11 @@ public class UserVO {
 
   private String userName;
 
-  public UserVO(String userId, String userName) {
+  private String connect;
+
+  public UserVO(String userId, String userName, String connect) {
     this.userId = userId;
     this.userName = userName;
+    this.connect = connect;
   }
 }

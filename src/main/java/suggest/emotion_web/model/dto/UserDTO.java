@@ -18,10 +18,15 @@ public class UserDTO {
 
   private LocalDateTime createdDate;
 
+  private String connect;
+
   public UserDTO(User user) {
     this.id = user.getId();
     this.userId = user.getUserId();
     this.userName = user.getUserName();
     this.createdDate = user.getCreatedDate();
+    if(user.getConnect()!=null) {
+      this.connect = user.getConnect();
+    }
   }
 }

@@ -28,7 +28,7 @@ public class ConnectorConfig {
     return tomcat;
   }
 
-  // HTTP 8080 포트로 들어오는 요청을 HTTPS 8443 포트로 리다이렉트
+  // HTTP 8080 포트로 들어오는 모든 요청을 HTTPS 8443 포트로 리다이렉트
   private Connector createHttpConnector() {
     Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
     connector.setScheme("http");

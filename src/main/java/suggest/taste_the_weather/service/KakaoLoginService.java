@@ -26,7 +26,7 @@ public class KakaoLoginService {
   String client_id = "a8eda776e6a96137d25561b1e5fe581a"; // 앱 키
   String response_type = "code";  // code로 고정
   String charset = "UTF-8";   // 인코딩 설정
-  String redirect_uri = "http://localhost:8080/kakao/login/callback"; // 전달받을 서비스 서버의 URI
+  String redirect_uri = "https://localhost:8443/kakao/login/callback"; // 전달받을 서비스 서버의 URI
 
   public String getKakaoAuthorizeUrl () throws UnsupportedEncodingException {
 

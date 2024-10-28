@@ -32,7 +32,7 @@ public class NaverLoginService {
 
   //네이버 로그인화면 요청
   public String getNaverAuthorizeUrl() throws MalformedURLException, UnsupportedEncodingException {
-    String redirect_uri = "http://localhost:8080/naver/login/callback";
+    String redirect_uri = "https://localhost:8443/naver/login/callback";
     // URL 인코딩
     String encodedRedirectUri = URLEncoder.encode(redirect_uri, "UTF-8");
     String encodedState = URLEncoder.encode(client_secret, "UTF-8");

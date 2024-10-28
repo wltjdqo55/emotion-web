@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QUser extends EntityPathBase<User> {
 
-    private static final long serialVersionUID = 489081321L;
+    private static final long serialVersionUID = 736269047L;
 
     public static final QUser user = new QUser("user");
 

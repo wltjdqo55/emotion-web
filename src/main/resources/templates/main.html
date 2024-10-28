@@ -14,7 +14,7 @@
     <div class="main-banner">
         <h2>날씨에 따른 맛집을 추천해 드립니다!</h2>
         <div class="emotion-input">
-            <button class="recommend-Button">맛집 추천 받기</button>
+            <button @click="findMyLocation" class="recommend-Button">맛집 추천 받기</button>
         </div>
     </div>
 </div>
@@ -37,10 +37,100 @@
                 userName : ""
             },
             isUser : false,
-            emotionSelect : ""
+            emotionSelect : "",
+            statusMessage: "",
+            RE: 6371.00877, // 지구 반경 (km)
+            GRID: 5.0, // 격자 간격 (km)
+            SLAT1: 30.0, // 투영 위도 1 (degree)
+            SLAT2: 60.0, // 투영 위도 2 (degree)
+            OLON: 126.0, // 기준점 경도 (degree)
+            OLAT: 38.0, // 기준점 위도 (degree)
+            XO: 43, // 기준점 X 좌표
+            YO: 136  // 기준점 Y 좌표
         },
-        methods : $.extend({}, vueMethods,{
+        methods: $.extend({}, vueMethods, {
+            findMyLocation : function () {
+                this.statusMessage = "위치 파악 중…";
+                if (!navigator.geolocation) {
+                    this.statusMessage = "브라우저가 위치 정보를 지원하지 않음";
+                    return;
+                }
 
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        const gridXY = this.fnLatLon2XY(latitude, longitude);
+                        console.log("격자 X:", gridXY.x, "격자 Y:", gridXY.y);
+
+                        this.geoLocationApi(gridXY.x, gridXY.y);
+                    },
+                    () => {
+                        this.statusMessage = "현재 위치를 가져올 수 없음";
+                    }
+                );
+            },
+            geoLocationApi : function (x, y) {
+                axios.get('/api/geoLocationApi', {
+                    params : {
+                        latitude : x,
+                        longitude : y
+                    }
+                })
+                .then(res => {
+                    console.log(res.data);
+                })
+                .catch(error => {
+                    console.error("False");
+                })
+            },
+            fnLatLon2XY(lat, lon) {
+                const DEGRAD = Math.PI / 180.0;
+                const RADDEG = 180.0 / Math.PI;
+
+                const re = this.RE / this.GRID;
+                const slat1 = this.SLAT1 * DEGRAD;
+                const slat2 = this.SLAT2 * DEGRAD;
+                const olon = this.OLON * DEGRAD;
+                const olat = this.OLAT * DEGRAD;
+
+                let sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) /
+                         Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+                sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+
+                const sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+                const ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+
+                const sfVal = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+                const roVal = re * sfVal / Math.pow(ro, sn);
+
+                const ra = Math.tan(Math.PI * 0.25 + lat * DEGRAD * 0.5);
+                const raVal = re * sfVal / Math.pow(ra, sn);
+
+                let theta = lon * DEGRAD - olon;
+                if (theta > Math.PI) theta -= 2.0 * Math.PI;
+                if (theta < -Math.PI) theta += 2.0 * Math.PI;
+
+                theta *= sn;
+
+                const x = Math.floor(raVal * Math.sin(theta) + this.XO + 0.5);
+                const y = Math.floor(roVal - raVal * Math.cos(theta) + this.YO + 0.5);
+
+                return { x, y };
+            },
+            findNearestGrid : function(lat, lon, gridData) {
+                let nearestGrid = null;
+                let minDistance = Infinity;
+
+                gridData.forEach(grid => {
+                    const distance = haversineDistance(lat, lon, grid.lat, grid.lon);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestGrid = grid;
+                    }
+                });
+
+                return nearestGrid; // 가장 가까운 격자 지점 반환
+            }
         }),
         created() {
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-import suggest.taste_the_weather.model.dto.NaverTokenDTO;
+import suggest.taste_the_weather.model.dto.naver.NaverTokenDTO;
 import suggest.taste_the_weather.model.dto.UserDTO;
 import suggest.taste_the_weather.model.entity.User;
 import suggest.taste_the_weather.model.vo.UserVO;

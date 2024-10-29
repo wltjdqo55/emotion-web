@@ -1,4 +1,4 @@
-package suggest.taste_the_weather.model.dto;
+package suggest.taste_the_weather.model.dto.naver;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

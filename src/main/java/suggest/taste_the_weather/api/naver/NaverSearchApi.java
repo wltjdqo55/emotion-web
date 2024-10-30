@@ -1,6 +1,10 @@
 package suggest.taste_the_weather.api.naver;
 
+import com.google.code.geocoder.Geocoder;
+import com.google.code.geocoder.GeocoderRequestBuilder;
+import com.google.code.geocoder.model.*;
 import org.json.JSONObject;
+import suggest.taste_the_weather.model.dto.naver.NaverSearchDTO;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -25,7 +29,7 @@ public class NaverSearchApi {
 
   String clientId = "dYzaofroFRhBPbIOcbMP";   // 클라이언트 키
   String clientSecret = "JfHqgTgeii";         // 시크릿 키
-  int display = 3;                            // 한번에 표시할 검색 결과 개수
+  int display = 0;                            // 한번에 표시할 검색 결과 개수
   int start = 1;                              // 검색 시작 위치
   String sort = "comment";                    // 검색 정렬 방법 => comment : 리뷰순, random : 정확도순
   String query = "";                          // 네이버 검색어
@@ -38,27 +42,23 @@ public class NaverSearchApi {
     ArrayList<String> foodList = pickRandomFoods();
     System.out.println(foodList);
 
+    ArrayList<NaverSearchDTO> naverSearchDTO = new ArrayList<NaverSearchDTO>();
+
     if ( foodList == null ) {
       query = address + " 맛집";
+      display = 3;
+
+      String responseBody = requestURL();
+      System.out.println(responseBody);
     } else {
+      for ( String food : foodList ) {
+        query = address + " " + food + " 맛집";
+        display = 1;
 
+        String responseBody = requestURL();
+        System.out.println(responseBody);
+      }
     }
-
-    try {
-      query = URLEncoder.encode(query, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException("검색어 인코딩 실패",e);
-    }
-
-    String apiURL = "https://openapi.naver.com/v1/search/local.json?sort=" + sort + "&display=" + display +
-                  "&start=" + start + "&query=" + query;          // api 호출 url
-
-    Map<String, String> requestHeaders = new HashMap<>();
-    requestHeaders.put("X-Naver-Client-Id", clientId);
-    requestHeaders.put("X-Naver-Client-Secret", clientSecret);
-    String responseBody = get(apiURL,requestHeaders);
-
-    System.out.println(responseBody);
   }
 
   private static String get(String apiUrl, Map<String, String> requestHeaders){
@@ -160,6 +160,25 @@ public class NaverSearchApi {
       list.add(foodArray[index]);
     }
     return list;
+  }
+
+  public String requestURL () {
+
+    try {
+      query = URLEncoder.encode(query, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException("검색어 인코딩 실패",e);
+    }
+
+    String apiURL = "https://openapi.naver.com/v1/search/local.json?sort=" + sort + "&display=" + display +
+        "&start=" + start + "&query=" + query;          // api 호출 url
+//    String apiURL = "https://openapi.naver.com/v1/search/blog?query=" + query;
+
+    Map<String, String> requestHeaders = new HashMap<>();
+    requestHeaders.put("X-Naver-Client-Id", clientId);
+    requestHeaders.put("X-Naver-Client-Secret", clientSecret);
+
+    return get(apiURL,requestHeaders);
   }
 
 }

@@ -14,11 +14,11 @@
     <div class="main-banner">
         <h2>오늘은 뭘 먹어야 하지?</h2>
         <div class="emotion-input">
-            <button @click="findMyLocation" class="recommend-Button">맛집 추천 받기</button>
+            <button @click="geoLocationApi" class="recommend-Button">맛집 추천 받기</button>
         </div>
     </div>
 </div>
-<div id="map" style="width:45%;height:500px;margin-top:40px;margin-bottom:40px;margin-left:40px;margin-right:40px;"></div>
+<div id="map" style="width:45%;height:600px;margin:40px;"></div>
 <script src="/plugins/vueJs/vue.js"></script>
 <script type="text/javascript" src="/plugins/axios/axios.min.js"></script>
 <script src="/dist/jquery/jquery.js"></script>
@@ -39,8 +39,11 @@
                 userName : ""
             },
             isUser : false,
+            latitude : "",
+            longitude : "",
             emotionSelect : "",
             statusMessage: "",
+            isMap : false,
             RE: 6371.00877, // 지구 반경 (km)
             GRID: 5.0, // 격자 간격 (km)
             SLAT1: 30.0, // 투영 위도 1 (degree)
@@ -60,57 +63,56 @@
 
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const { latitude, longitude } = position.coords;
+                        const {latitude, longitude} = position.coords;
 
-                        this.createdMap(latitude, longitude);
+                        setTimeout(() => {
+                            this.createdMap(latitude, longitude);
+                        }, 500)
 
-                        const gridXY = this.fnLatLon2XY(latitude, longitude);
-                        console.log("격자 X:", gridXY.x, "격자 Y:", gridXY.y);
-
-                        this.geoLocationApi(gridXY.x, gridXY.y);
+                        this.latitude = latitude;
+                        this.longitude = longitude;
                     },
                     () => {
                         this.statusMessage = "현재 위치를 가져올 수 없음";
                     }
                 );
             },
-            createdMap: function (latitude, longitude) {
-                let mapContainer = document.getElementById('map'); // 지도를 표시할 div
-                console.log(latitude, longitude)
-
-                // mapContainer가 존재하는지 확인
-                if (!mapContainer) {
-                    console.error("지도 컨테이너를 찾을 수 없습니다.");
-                    return;
-                }
-
-                let mapOption = {
-                    center: new kakao.maps.LatLng(latitude, longitude), // 지도의 중심좌표
+            createdMap: function (lat, lon) {
+                var mapContainer = document.getElementById('map'); // 지도를 표시할 div
+                console.log(lat, lon)
+                var mapOption = {
+                    center: new kakao.maps.LatLng(lat, lon), // 지도의 중심좌표
                     level: 3 // 지도의 확대 레벨
                 };
 
-                let map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
 
-                let locPosition = new kakao.maps.LatLng(latitude, longitude), // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
+                var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+                var locPosition = new kakao.maps.LatLng(lat, lon), // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
                     message = '<div style="padding:5px;">여기에 계신가요?!</div>'; // 인포윈도우에 표시될 내용입니다
+                map.setCenter(locPosition);
 
                 // 마커와 인포윈도우를 표시합니다
                 this.displayMarker(locPosition, message, map);
+                this.isMap = true;
             },
             displayMarker : function (locPosition, message, map) {
                 // 마커를 생성합니다
-                let marker = new kakao.maps.Marker({
+                var marker = new kakao.maps.Marker({
                     map: map,
                     position: locPosition
                 });
 
-                let iwContent = message, // 인포윈도우에 표시할 내용
+                var iwContent = message, // 인포윈도우에 표시할 내용
                     iwRemoveable = true;
 
+                console.log(this.latitude, this.longitude)
                 // 인포윈도우를 생성합니다
-                let infowindow = new kakao.maps.InfoWindow({
+                var infowindow = new kakao.maps.InfoWindow({
                     content : iwContent,
-                    removable : iwRemoveable
+                    map : map,
+                    removable : iwRemoveable,
+                    disableAutoPan: true
                 });
 
                 // 인포윈도우를 마커위에 표시합니다
@@ -119,11 +121,16 @@
                 // 지도 중심좌표를 접속위치로 변경합니다
                 map.setCenter(locPosition);
             },
-            geoLocationApi : function (x, y) {
+            geoLocationApi : function () {
+                let vm = this;
+
+                let gridXY = vm.fnLatLon2XY(vm.latitude, vm.longitude);
+                console.log("격자 X:", gridXY.x, "격자 Y:", gridXY.y);
+
                 axios.get('/api/geoLocationApi', {
                     params : {
-                        latitude : x,
-                        longitude : y
+                        latitude : gridXY.x,
+                        longitude : gridXY.y
                     }
                 })
                 .then(res => {
@@ -169,9 +176,9 @@
             }
         }),
         created() {
-
         },
         mounted() {
+            this.findMyLocation();
             this.getUserInfo();
         }
     });

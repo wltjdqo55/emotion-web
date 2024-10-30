@@ -10,4 +10,9 @@ public class RegionVO {
   private int latitude;
 
   private int longitude;
+
+  private String x;
+
+  private String y;
+
 }

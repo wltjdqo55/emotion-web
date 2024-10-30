@@ -1,8 +1,6 @@
 package suggest.taste_the_weather.api.naver;
 
-import com.google.code.geocoder.Geocoder;
-import com.google.code.geocoder.GeocoderRequestBuilder;
-import com.google.code.geocoder.model.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import suggest.taste_the_weather.model.dto.naver.NaverSearchDTO;
 
@@ -31,25 +29,27 @@ public class NaverSearchApi {
   String clientSecret = "JfHqgTgeii";         // 시크릿 키
   int display = 0;                            // 한번에 표시할 검색 결과 개수
   int start = 1;                              // 검색 시작 위치
-  String sort = "comment";                    // 검색 정렬 방법 => comment : 리뷰순, random : 정확도순
+  String sort = "random";                    // 검색 정렬 방법 => comment : 리뷰순, random : 정확도순
   String query = "";                          // 네이버 검색어
 
   String address = "";                        // 사용자가 위치한 지역
   HashMap<String, String> map = new HashMap<>();  // 날씨 정보를 담은 map
 
-  public void searchLocationFood (JSONObject jsonData) {
+  public ArrayList<NaverSearchDTO> searchLocationFood (JSONObject jsonData) {
     jsonParsing(jsonData);    // 데이터 파싱
     ArrayList<String> foodList = pickRandomFoods();
+
     System.out.println(foodList);
 
-    ArrayList<NaverSearchDTO> naverSearchDTO = new ArrayList<NaverSearchDTO>();
-
+    ArrayList<NaverSearchDTO> naverSearchList = new ArrayList<>();
     if ( foodList == null ) {
       query = address + " 맛집";
       display = 3;
 
       String responseBody = requestURL();
       System.out.println(responseBody);
+
+      naverSearchList.addAll(parseNaverSearchItems(responseBody));
     } else {
       for ( String food : foodList ) {
         query = address + " " + food + " 맛집";
@@ -57,8 +57,11 @@ public class NaverSearchApi {
 
         String responseBody = requestURL();
         System.out.println(responseBody);
+        naverSearchList.addAll(parseNaverSearchItems(responseBody));
       }
     }
+    System.out.println("searchList=> " + naverSearchList);
+    return naverSearchList;
   }
 
   private static String get(String apiUrl, Map<String, String> requestHeaders){
@@ -179,6 +182,31 @@ public class NaverSearchApi {
     requestHeaders.put("X-Naver-Client-Secret", clientSecret);
 
     return get(apiURL,requestHeaders);
+  }
+
+  // 공통된 JSON 파싱 로직
+  private List<NaverSearchDTO> parseNaverSearchItems(String responseBody) {
+    List<NaverSearchDTO> naverSearchList = new ArrayList<>();
+    JSONObject jsonResponse = new JSONObject(responseBody);
+    JSONArray items = jsonResponse.getJSONArray("items");
+
+    for (int i = 0; i < items.length(); i++) {
+      JSONObject item = items.getJSONObject(i);
+      String title = item.getString("title");
+      String link = item.getString("link");
+      String category = item.getString("category");
+      String description = item.getString("description");
+      String telephone = item.getString("telephone");
+      String address = item.getString("address");
+      String roadAddress = item.getString("roadAddress");
+      String mapx = item.getString("mapx");
+      String mapy = item.getString("mapy");
+
+      NaverSearchDTO naverSearchDTO = new NaverSearchDTO(title, link, category, description, telephone, address, roadAddress, mapx, mapy);
+      naverSearchList.add(naverSearchDTO);
+    }
+
+    return naverSearchList;
   }
 
 }

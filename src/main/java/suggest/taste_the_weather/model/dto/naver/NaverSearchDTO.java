@@ -13,13 +13,26 @@ public class NaverSearchDTO {
   private int total;
   private int start;
   private int display;
-  private List<RestaurantDTO> items; // Restaurant 객체 리스트
 
-  public NaverSearchDTO (String lastBuildDate, int total, int start, int display, List<RestaurantDTO> items) {
-    this.lastBuildDate = lastBuildDate;
-    this.total = total;
-    this.start = start;
-    this.display = display;
-    this.items = items;
+  private String title;
+  private String link;
+  private String category;
+  private String description;
+  private String telephone;
+  private String address;
+  private String roadAddress;
+  private String mapx;
+  private String mapy;
+
+  public NaverSearchDTO (String title, String link, String category, String description, String telephone, String address, String roadAddress, String mapx, String mapy) {
+    this.title = title;
+    this.link = link;
+    this.category = category;
+    this.description = description;
+    this.telephone = telephone;
+    this.address = address;
+    this.roadAddress = roadAddress;
+    this.mapx = mapx;
+    this.mapy = mapy;
   }
 }

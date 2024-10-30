@@ -39,3 +39,37 @@
 .footer p {
     margin: 5px 0;
 }
+
+.container {
+     display: flex; /* 좌우 배치 */
+ }
+
+.map {
+    width: 45%; /* 지도의 너비 */
+    height: 600px; /* 지도의 높이 */
+    margin: 40px; /* 외부 여백 */
+}
+
+.restaurant-list {
+    width: 50%; /* 음식점 목록의 너비 */
+    margin: 40px; /* 외부 여백 */
+    display: grid; /* 그리드 형식 */
+    grid-template-columns: repeat(1, 1fr); /* 열 개수 설정 */
+    gap: 20px; /* 아이템 간의 간격 */
+}
+
+.restaurant-item {
+    background-color: #f9f9f9; /* 아이템 배경색 */
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    padding: 20px; /* 내부 여백 */
+    border-radius : 35px;
+}
+
+.restaurant-item h3 {
+    margin: 0 0 10px 0; /* 제목의 여백 조정 */
+}
+
+.restaurant-item p {
+    margin: 5px 0; /* 문단의 여백 조정 */
+}

@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import suggest.taste_the_weather.api.naver.NaverSearchApi;
 import suggest.taste_the_weather.api.weather.WeatherData;
+import suggest.taste_the_weather.model.dto.naver.NaverSearchDTO;
 import suggest.taste_the_weather.model.vo.RegionVO;
 import suggest.taste_the_weather.service.RegionService;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,26 +22,15 @@ public class RegionController {
 
   @GetMapping("/api/geoLocationApi")
   @ResponseBody
-  public String geoLocationApi (RegionVO regionVO) throws IOException {
-    String parent = "";
-    String child = "";
-    List<Object[]> results = regionService.getRegionValue(regionVO.getLatitude(), regionVO.getLongitude());
-    if (!results.isEmpty()) {
-      Object[] row = results.get(0);
-      parent = String.valueOf(row[0].toString());
-      child = String.valueOf(row[1].toString());
-    }
+  public ArrayList<NaverSearchDTO> geoLocationApi (RegionVO regionVO) throws IOException {
 
     WeatherData weatherData = new WeatherData();  // 날씨 데이터 가져오기
     NaverSearchApi naverSearchApi = new NaverSearchApi();
 
-    JSONObject jsonData = weatherData.lookUpWeather(regionVO.getLatitude(), regionVO.getLongitude(), parent + " " + child);
-    naverSearchApi.searchLocationFood(jsonData);
-
+    JSONObject jsonData = weatherData.lookUpWeather(regionVO.getLatitude(), regionVO.getLongitude(), regionVO.getX(), regionVO.getY());
+    ArrayList<NaverSearchDTO> list = naverSearchApi.searchLocationFood(jsonData);
 
     //System.out.println(jsonData);
-
-
-    return "";
+    return list;
   }
 }

@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WeatherData {
 
@@ -23,8 +24,9 @@ public class WeatherData {
   private String baseTime = calculateBaseTime();
   private String type = "json";	//조회하고 싶은 type( json, xml 중 고름 )
 
-  public JSONObject lookUpWeather(int x, int y, String address) throws IOException, JSONException {
-    System.out.println(address);
+  public JSONObject lookUpWeather(int x, int y, String qn, String qy) throws IOException, JSONException {
+
+    String address = toAddress(qn, qy);
 //		참고문서에 있는 url주소
     String apiUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst";
 //    홈페이지에서 받은 키 ( 공공 데이터 포털 )
@@ -148,5 +150,60 @@ public class WeatherData {
     response.put("address", address);
 
     return response;
+  }
+
+  public String toAddress(String x, String y) throws IOException, JSONException {
+
+    JsonReader jsonReader = new JsonReader();
+
+    // 홈페이지에서 받은 키 (국토교통부 - 디지털트윈국토)
+    String apiKey = "2BDC8B43-9DE6-3157-810B-3E888EBC89A2";
+    // 위도
+    String latitude = x;
+    // 경도
+    String longitude = y;
+    // api 테스트
+    // # 파라미터 종류 확인 : http://www.vworld.kr/dev/v4dv_geocoderguide2_s002.do
+    String reverseGeocodeURL = "http://api.vworld.kr/req/address?"
+        + "service=address&request=getAddress&version=2.0&crs=epsg:4326&point="
+        +  longitude + "," +  latitude
+        + "&format=json"
+        + "&type=both&zipcode=true"
+        + "&simple=false&"
+        + "key="+apiKey;
+    String getJson = jsonReader.callURL(reverseGeocodeURL);
+    System.out.println("getJson => " + getJson);
+    Map<String, Object> map = jsonReader.string2Map(getJson);
+    System.out.println("json => " + map.toString());
+
+    // 지도 결과 확인하기
+    ArrayList reverseGeocodeResultArr = (ArrayList) ((HashMap<String, Object>) map.get("response")).get("result");
+
+    String parcel_address = "";
+    String road_address = "";
+    String address = "";
+
+    for (int counter = 0; counter < reverseGeocodeResultArr.size(); counter++) {
+      HashMap<String, Object> tmp = (HashMap<String, Object>) reverseGeocodeResultArr.get(counter);
+      System.out.println("tmp = > " + tmp);
+      String level0 = (String) ((HashMap<String, Object>) tmp.get("structure")).get("level0");
+      String level1 = (String) ((HashMap<String, Object>) tmp.get("structure")).get("level1");
+      String level2 = (String) ((HashMap<String, Object>) tmp.get("structure")).get("level2");
+      //주소 : 도, 시, 구, 동
+      address  = (String) tmp.get("text");
+
+      if (tmp.get("type").equals("parcel")) {
+        parcel_address = (String) tmp.get("text");
+        parcel_address = parcel_address.replace(level0, "").replace(level1, "").replace(level2, "").trim();
+      } else {
+        road_address = "도로 주소:" + (String) tmp.get("text");
+        road_address = road_address.replace(level0, "").replace(level1, "").replace(level2, "").trim();
+      }
+    }
+
+    System.out.println("parcel_address = > " + parcel_address);
+    System.out.println("road_address = > " + road_address);
+
+    return address;
   }
 }

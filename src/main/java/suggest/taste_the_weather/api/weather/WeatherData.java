@@ -91,6 +91,7 @@ public class WeatherData {
       WeatherDTO weatherDTO = new WeatherDTO(baseDate, baseTime, category, obsrValue, nx, ny, address);
       weatherDataList.add(weatherDTO);
     }
+    System.out.println(weatherDataList);
     String time = currentTime(weatherDataList);
     HashMap<String, String> map = weatherInfoText(weatherDataList);
     return createResponse(time, map, address);
@@ -129,16 +130,10 @@ public class WeatherData {
           map.put("precipitation", "rain");        // 비오는 날
         }
       } else if ( category.equals("T1H") ) {
-        double d = Double.parseDouble(obsrValue);
-        if ( d > 29.0f ) {
-          map.put("temperature", "hot");  // 더움
-        } else if ( d < 5.0f ) {
-          map.put("temperature", "cold"); // 추움
-        } else {
-          map.put("temperature", "moderation"); // 적당한 날
-        }
+        map.put("temperature", obsrValue);
       }
     }
+    map.put("weatherDate", list.get(0).getBaseDate());
     return map;
   }
 

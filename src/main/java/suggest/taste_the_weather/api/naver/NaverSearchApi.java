@@ -129,7 +129,6 @@ public class NaverSearchApi {
 
   private ArrayList<String> pickRandomFoods () {
     ArrayList<String> list = new ArrayList<>();
-
     if( map.containsKey("precipitation") ) {
       String precipitation = map.get( "precipitation" );
       String temperature = map.get("temperature");
@@ -202,7 +201,8 @@ public class NaverSearchApi {
       String mapx = item.getString("mapx");
       String mapy = item.getString("mapy");
 
-      NaverSearchDTO naverSearchDTO = new NaverSearchDTO(title, link, category, description, telephone, address, roadAddress, mapx, mapy);
+      NaverSearchDTO naverSearchDTO = new NaverSearchDTO(title, link, category, description, telephone, address,
+          roadAddress, mapx, mapy, map.get("temperature"), map.get("precipitation"), map.get("weatherDate"));
       naverSearchList.add(naverSearchDTO);
     }
 

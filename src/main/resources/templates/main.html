@@ -173,6 +173,24 @@
             },
             geoLocationApi : function () {
                 let vm = this;
+                let isLogin = "";
+
+                if(confirm("카카오톡으로 정보를 받으시겠습니까?")){
+                    if (vm.user != "") {    // 로그인 되어 있을 때
+                        isLogin = "loginOk_infoOK";
+                    } else {                // 로그인 되어 있지 않을때
+                        isLogin = "loginNo_infoOK";
+                        location.href = "/kakaoLogin";
+                        return false;
+                    }
+                } else {
+                    if (vm.user != "") {    // 로그인 되어 있을 때
+                        isLogin = "loginOk_infoNo";
+                    } else {
+                        isLogin = "loginNo_infoNo";
+                    }
+
+                }
 
                 // 로딩 시작
                 vm.loading = true;
@@ -214,9 +232,11 @@
                         };
                     }
                     vm.selectedFoodMarker();
-                    if(vm.user != "") {     // 로그인 여부
+
+                    if ( isLogin == "loginOk_infoOK" ) {
                         vm.sendToMe();
                     }
+
                 })
                 .catch(error => {
                     console.error("False");
@@ -326,6 +346,7 @@
                 }
               })
               .then(function(response) {
+                alert ("카카오톡으로 정보가 발송되었습니다.")
                 console.log('success:', response);
               })
               .catch(function(error) {

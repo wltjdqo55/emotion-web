@@ -34,11 +34,13 @@ const vueMethods = {
         axios.get('/account/getUserInfo')
             .then(res => {
                 vm.user = res.data;
+                console.log(vm.user);
                 if(vm.user.length < 1) {
                     vm.isUser = false;
                 }
                 else{
                     localStorage.setItem('userInfo', JSON.stringify(vm.user));
+                    Kakao.Auth.setAccessToken(vm.user.token);
                     vm.isUser = true;
                 }
             })

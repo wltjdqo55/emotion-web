@@ -37,7 +37,7 @@ public class WeatherData {
     urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode(String.valueOf(x), "UTF-8")); //경도
     urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode(String.valueOf(y), "UTF-8")); //위도
     urlBuilder.append("&" + URLEncoder.encode("base_date","UTF-8") + "=" + URLEncoder.encode(baseDate, "UTF-8")); /* 조회하고싶은 날짜*/
-    urlBuilder.append("&" + URLEncoder.encode("base_time","UTF-8") + "=" + URLEncoder.encode(baseTime, "UTF-8")); /* 조회하고싶은 시간 AM 02시부터 3시간 단위 */
+    urlBuilder.append("&" + URLEncoder.encode("base_time","UTF-8") + "=" + URLEncoder.encode(baseTime, "UTF-8")); /* 조회하고싶은 시간*/
     urlBuilder.append("&" + URLEncoder.encode("dataType","UTF-8") + "=" + URLEncoder.encode(type, "UTF-8"));	/* 타입 */
 
     /*
@@ -66,9 +66,13 @@ public class WeatherData {
     rd.close();
     conn.disconnect();
     String result= sb.toString();
-
+    System.out.println("result=>" + result);
     //=======이 밑에 부터는 json에서 데이터 파싱해 오는 부분=====//
-//    System.out.println(result);
+
+    // 결과가 비어있거나 에러 메시지를 포함하는 경우 null 반환
+    if (result == null || result.isEmpty() || result.contains("SERVICE ERROR") || result.contains("<OpenAPI_ServiceResponse>")) {
+      return null; // 또는 throw new CustomException("Error in response");
+    }
 
     List<WeatherDTO> weatherDataList = new ArrayList<>();
 

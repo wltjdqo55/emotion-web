@@ -79,7 +79,7 @@ public class LoginController {
 
     // 회원정보 가져오기
     UserDTO userDTO = kakaoLoginService.setUserInfo(String.valueOf(userInfo.get("id")), (String) userInfo.get("nickname"));
-
+    userDTO.setToken(accessToken);
     // 세션 등록
     if(userDTO != null) {
       UserSession.setSession(userDTO, session, 3600);

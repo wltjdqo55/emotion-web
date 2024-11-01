@@ -54,7 +54,7 @@
     width: 50%; /* 음식점 목록의 너비 */
     margin: 40px; /* 외부 여백 */
     display: grid; /* 그리드 형식 */
-    grid-template-columns: repeat(1, 1fr); /* 열 개수 설정 */
+    grid-template-columns: repeat(1, 1fr); /* 한 개의 열 */
     gap: 20px; /* 아이템 간의 간격 */
 }
 
@@ -72,4 +72,28 @@
 
 .restaurant-item p {
     margin: 5px 0; /* 문단의 여백 조정 */
+}
+
+.loading-message {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    height: 600px; /* 음식점 목록 영역과 같은 높이로 설정 */
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8); /* 약간 투명한 배경 */
+    border-radius: 10px;
+    animation: pulse 1.5s infinite; /* 애니메이션 효과 */
+}
+
+/* 로딩 텍스트가 천천히 커졌다 작아지는 애니메이션 */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
 }

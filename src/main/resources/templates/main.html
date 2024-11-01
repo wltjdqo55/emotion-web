@@ -14,13 +14,14 @@
     <div class="main-banner">
         <h2>오늘은 뭘 먹어야 하지?</h2>
         <div class="emotion-input">
-            <button @click="geoLocationApi" class="recommend-Button">맛집 추천 받기</button>
+            <button @click="searchLocationFood" class="recommend-Button">맛집 추천 받기</button>
         </div>
     </div>
     <div class="container">
         <div id="map" class="map" style="width:45%;height:600px;margin:40px;"></div>
         <div class="restaurant-list">
-            <div class="restaurant-item" v-for="(item, index) in searchList">
+            <div v-if="loading" class="loading-message">음식점 찾는 중...</div>
+            <div class="restaurant-item" v-for="(item, index) in searchList" v-if="!loading">
                 <h2>{{ item.title }}&nbsp;&nbsp;&nbsp;<span style="font-size:17px;">{{ item.category }}</span></h2>
                 <h3>{{ item.address }}</h3>
                 <a :href="item.link" target="_blank">자세히 보기</a>
@@ -35,6 +36,11 @@
 <script src="/dist/js/toggles-list-filter.js"></script>
 <script src="/dist/js/vueCommon.js"></script>
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5fa805c24e46ec4658f475bc06dd66ad"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+        integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+<script>
+    Kakao.init('5fa805c24e46ec4658f475bc06dd66ad'); // 여기에 본인의 앱 키 입력
+</script>
 <script>
     $(function() {
         $('#header-container').load('/common/html/header.html');
@@ -47,8 +53,9 @@
             user : {
                 userName : ""
             },
+            loading: false,             // 로딩 상태를 위한 변수
             searchList : {},            // 네이버 검색 정보
-            isUser : false,
+            isUser : false,             // 로그인 상태
             latitude : "",              // 위도
             longitude : "",             // 경도
             statusMessage: "",          // 위치 정보 가져올 때 상태
@@ -68,28 +75,53 @@
             markers : []                // 다중 마커 정보
         },
         methods: $.extend({}, vueMethods, {
-            findMyLocation : function () {
-                this.statusMessage = "위치 파악 중…";
-                if (!navigator.geolocation) {
-                    this.statusMessage = "브라우저가 위치 정보를 지원하지 않음";
-                    return;
-                }
+            geoLocationApi : function () {
+                let vm = this;
+                let gridXY = vm.fnLatLon2XY(vm.latitude, vm.longitude);
+                console.log("격자 X:", gridXY.x, "격자 Y:", gridXY.y);
 
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const {latitude, longitude} = position.coords;
-
-                        setTimeout(() => {
-                            this.createdMap(latitude, longitude);
-                        }, 500)
-
-                        this.latitude = latitude;
-                        this.longitude = longitude;
-                    },
-                    () => {
-                        this.statusMessage = "현재 위치를 가져올 수 없음";
+                axios.get('/api/geoLocationApi', {
+                    params : {
+                        latitude : gridXY.x,
+                        longitude : gridXY.y,
+                        x : vm.latitude,
+                        y : vm.longitude
                     }
-                );
+                })
+                .then(res => {
+                    console.log(res.data);
+                })
+                .catch(error => {
+                    console.log("error");
+                })
+            },
+            findMyLocation: function () {
+                return new Promise((resolve, reject) => {
+                    this.statusMessage = "위치 파악 중…";
+
+                    if (!navigator.geolocation) {
+                        this.statusMessage = "브라우저가 위치 정보를 지원하지 않음";
+                        reject(new Error("Geolocation not supported"));
+                        return;
+                    }
+
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const { latitude, longitude } = position.coords;
+                            this.latitude = latitude;
+                            this.longitude = longitude;
+
+                            setTimeout(() => {
+                                this.createdMap(latitude, longitude);
+                                resolve(); // 위치 정보 획득 및 지도 생성 후 Promise 완료
+                            }, 500);
+                        },
+                        () => {
+                            this.statusMessage = "현재 위치를 가져올 수 없음";
+                            reject(new Error("Failed to retrieve location"));
+                        }
+                    );
+                });
             },
             createdMap: function (lat, lon) {
                 this.mapContainer = document.getElementById('map'); // 지도를 표시할 div
@@ -152,7 +184,6 @@
                     });
                     this.markers.push(marker);
                 }
-                console.log(this.markers);
             },
             clearMarker : function () {
                 // 배열에 추가된 마커들을 지도에 표시하거나 삭제하는 함수입니다
@@ -160,8 +191,11 @@
                     this.markers[i].setMap(null);
                 }
             },
-            geoLocationApi : function () {
+            searchLocationFood : function () {
                 let vm = this;
+
+                // 로딩 시작
+                vm.loading = true;
 
                 // 다중 마커 초기화
                 if(vm.positions.length > 0){
@@ -170,38 +204,42 @@
                     vm.markers = [];
                 }
 
-                let gridXY = vm.fnLatLon2XY(vm.latitude, vm.longitude);
-                console.log("격자 X:", gridXY.x, "격자 Y:", gridXY.y);
-
-                axios.get('/api/geoLocationApi', {
+                axios.get('api/searchLocationFood', {
                     params : {
-                        latitude : gridXY.x,
-                        longitude : gridXY.y,
                         x : vm.latitude,
                         y : vm.longitude
                     }
                 })
                 .then(res => {
-                    console.log(res.data);
                     vm.searchList = res.data;
+                    for ( let i = 0 ; i < vm.searchList.length ; i++ ) {
+                        vm.searchList[i].title = vm.searchList[i].title.replace('<b>', '').replace('</b>', '');
+                    }
 
+                    console.log(res.data);
                     const scale = 1e7;  // 경도, 위도 변환
 
                     for ( let i = 0 ; i < res.data.length ; i++) {
                         vm.positions[i] = {
                             title : res.data[i].title,
-                            latlng : new kakao.maps.LatLng(res.data[i].mapy/scale, res.data[i].mapx/scale)
+                            latlng : new kakao.maps.LatLng(res.data[i].mapy/scale, res.data[i].mapx/scale),
+                            link : res.data[i].link,
+                            address : res.data[i].address,
+                            category : res.data[i].category
                         };
                     }
-
-                    console.log(vm.positions);
-
                     vm.selectedFoodMarker();
-
+                    if(vm.user != "") {     // 로그인 여부
+                        vm.sendToMe();
+                    }
                 })
                 .catch(error => {
                     console.error("False");
                 })
+                .finally(() => {
+                    // 로딩 완료
+                    vm.loading = false;
+                });
             },
             fnLatLon2XY(lat, lon) {
                 const DEGRAD = Math.PI / 180.0;
@@ -236,13 +274,86 @@
                 const y = Math.floor(roVal - raVal * Math.cos(theta) + this.YO + 0.5);
 
                 return { x, y };
+            },
+            sendToMe: function () {
+              let vm = this;
+
+              // 날씨 URL 주소
+              let weatherUrl = "https://search.naver.com/search.naver?sm=top_hty&fbm=0&ie=utf8&query=%EB%82%A0%EC%94%A8";
+
+              // contents 배열 생성
+              let contents = [];
+
+              for (let i = 0; i < 3; i++) {
+                // HTML 태그 제거
+                vm.positions[i].title = vm.positions[i].title.replace('<b>', '').replace('</b>', '');
+
+                let imgUrl = ""
+                if( vm.positions[i].category == "음식점>카페,디저트" ){
+                     imgUrl = "https://freesvg.org/img/pitr_Coffee_cup_icon.png"
+                } else {
+                     imgUrl = "https://freesvg.org/img/bentolunch.png?w=150&h=150&fit=fill"
+                }
+
+                let query = "query=" + vm.positions[i].address + " " + vm.positions[i].title;
+
+                // 콘텐츠 항목 구성
+                let content = {
+                  title: "[" + vm.positions[i].category + "] " + vm.positions[i].title,
+                  description: vm.positions[i].address,
+                  image_url: imgUrl,
+                  image_width: 50,
+                  image_height: 50,
+                  link: {
+                    web_url: "https://search.naver.com/search.naver?" + query,
+                    mobile_web_url: "https://search.naver.com/search.naver?" + query
+                  }
+                };
+                contents.push(content);
+              }
+
+              console.log("contents =>", contents);
+
+              // 템플릿 설정
+              let template = {
+                object_type: "list",
+                header_title: "현재 날씨에 따른 음식 추천",
+                header_link: {
+                  web_url: weatherUrl,
+                  mobile_web_url: weatherUrl
+                },
+                contents: contents,
+                buttons: [
+                  {
+                    title: "날씨 정보 상세보기",
+                    link: {
+                      web_url: weatherUrl,
+                      mobile_web_url: weatherUrl
+                    }
+                  }
+                ]
+              };
+
+              Kakao.API.request({
+                url: '/v2/api/talk/memo/default/send',
+                data: {
+                  template_object: template
+                }
+              })
+              .then(function(response) {
+                console.log('success:', response);
+              })
+              .catch(function(error) {
+                console.log('error:', error);
+              });
             }
         }),
         created() {
         },
-        mounted() {
-            this.findMyLocation();
+        async mounted() {
+            await this.findMyLocation();
             this.getUserInfo();
+            this.geoLocationApi();
         }
     });
 </script>

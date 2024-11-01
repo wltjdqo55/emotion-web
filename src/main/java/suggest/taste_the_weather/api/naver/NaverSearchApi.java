@@ -2,6 +2,8 @@ package suggest.taste_the_weather.api.naver;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import suggest.taste_the_weather.api.weather.WeatherData;
+import suggest.taste_the_weather.model.dto.WeatherDTO;
 import suggest.taste_the_weather.model.dto.naver.NaverSearchDTO;
 
 import java.io.*;
@@ -34,11 +36,12 @@ public class NaverSearchApi {
 
   String address = "";                        // 사용자가 위치한 지역
   HashMap<String, String> map = new HashMap<>();  // 날씨 정보를 담은 map
+  WeatherData weatherData = new WeatherData();
 
-  public ArrayList<NaverSearchDTO> searchLocationFood (JSONObject jsonData) {
-    jsonParsing(jsonData);    // 데이터 파싱
+  public ArrayList<NaverSearchDTO> searchLocationFood (String x, String y) throws IOException {
+    //jsonParsing(jsonData);    // 데이터 파싱
     ArrayList<String> foodList = pickRandomFoods();
-
+    address = weatherData.toAddress(x, y);
     System.out.println(foodList);
 
     ArrayList<NaverSearchDTO> naverSearchList = new ArrayList<>();
@@ -46,6 +49,7 @@ public class NaverSearchApi {
       query = address + " 맛집";
       display = 3;
 
+      System.out.println(query);
       String responseBody = requestURL();
       System.out.println(responseBody);
 
@@ -55,6 +59,7 @@ public class NaverSearchApi {
         query = address + " " + food + " 맛집";
         display = 1;
 
+        System.out.println(query);
         String responseBody = requestURL();
         System.out.println(responseBody);
         naverSearchList.addAll(parseNaverSearchItems(responseBody));
@@ -128,7 +133,8 @@ public class NaverSearchApi {
   }
 
   private ArrayList<String> pickRandomFoods () {
-    ArrayList<String> list = new ArrayList<>();
+    ArrayList<String> list;
+    list = getFoodList(rainFoods);
     if( map.containsKey("precipitation") ) {
       String precipitation = map.get( "precipitation" );
       String temperature = map.get("temperature");

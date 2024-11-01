@@ -20,6 +20,8 @@ public class UserDTO {
 
   private String connect;
 
+  private String token;
+
   public UserDTO(User user) {
     this.id = user.getId();
     this.userId = user.getUserId();
@@ -28,5 +30,9 @@ public class UserDTO {
     if(user.getConnect()!=null) {
       this.connect = user.getConnect();
     }
+  }
+
+  public UserDTO(String token) {
+    this.token = token;
   }
 }

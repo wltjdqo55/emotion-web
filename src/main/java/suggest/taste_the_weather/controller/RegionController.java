@@ -22,22 +22,13 @@ public class RegionController {
 
   @GetMapping("/api/geoLocationApi")
   @ResponseBody
-  public JSONObject geoLocationApi (RegionVO regionVO) throws IOException {
+  public ArrayList<NaverSearchDTO> geoLocationApi (RegionVO regionVO) throws IOException {
 
     WeatherData weatherData = new WeatherData();  // 날씨 데이터 가져오기
+    NaverSearchApi naverSearchApi = new NaverSearchApi();
 
     JSONObject jsonData = weatherData.lookUpWeather(regionVO.getLatitude(), regionVO.getLongitude(), regionVO.getX(), regionVO.getY());
-
-    System.out.println(jsonData);
-    return jsonData;
-  }
-
-  @GetMapping("/api/searchLocationFood")
-  @ResponseBody
-  public ArrayList<NaverSearchDTO> searchLocationFood (RegionVO regionVO) throws  IOException {
-
-    NaverSearchApi naverSearchApi = new NaverSearchApi();
-    ArrayList<NaverSearchDTO> list = naverSearchApi.searchLocationFood(regionVO.getX(), regionVO.getY());
+    ArrayList<NaverSearchDTO> list = naverSearchApi.searchLocationFood(jsonData);
 
     return list;
   }

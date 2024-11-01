@@ -38,10 +38,9 @@ public class NaverSearchApi {
   HashMap<String, String> map = new HashMap<>();  // 날씨 정보를 담은 map
   WeatherData weatherData = new WeatherData();
 
-  public ArrayList<NaverSearchDTO> searchLocationFood (String x, String y) throws IOException {
-    //jsonParsing(jsonData);    // 데이터 파싱
+  public ArrayList<NaverSearchDTO> searchLocationFood (JSONObject jsonData) throws IOException {
+    jsonParsing(jsonData);    // 데이터 파싱
     ArrayList<String> foodList = pickRandomFoods();
-    address = weatherData.toAddress(x, y);
     System.out.println(foodList);
 
     ArrayList<NaverSearchDTO> naverSearchList = new ArrayList<>();
@@ -133,8 +132,8 @@ public class NaverSearchApi {
   }
 
   private ArrayList<String> pickRandomFoods () {
-    ArrayList<String> list;
-    list = getFoodList(rainFoods);
+    ArrayList<String> list = new ArrayList<>();
+
     if( map.containsKey("precipitation") ) {
       String precipitation = map.get( "precipitation" );
       String temperature = map.get("temperature");

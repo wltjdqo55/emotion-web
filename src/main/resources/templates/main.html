@@ -14,7 +14,7 @@
     <div class="main-banner">
         <h2>오늘은 뭘 먹어야 하지?</h2>
         <div class="emotion-input">
-            <button @click="searchLocationFood" class="recommend-Button">맛집 추천 받기</button>
+            <button @click="geoLocationApi" class="recommend-Button">맛집 추천 받기</button>
         </div>
     </div>
     <div class="container">
@@ -75,26 +75,6 @@
             markers : []                // 다중 마커 정보
         },
         methods: $.extend({}, vueMethods, {
-            geoLocationApi : function () {
-                let vm = this;
-                let gridXY = vm.fnLatLon2XY(vm.latitude, vm.longitude);
-                console.log("격자 X:", gridXY.x, "격자 Y:", gridXY.y);
-
-                axios.get('/api/geoLocationApi', {
-                    params : {
-                        latitude : gridXY.x,
-                        longitude : gridXY.y,
-                        x : vm.latitude,
-                        y : vm.longitude
-                    }
-                })
-                .then(res => {
-                    console.log(res.data);
-                })
-                .catch(error => {
-                    console.log("error");
-                })
-            },
             findMyLocation: function () {
                 return new Promise((resolve, reject) => {
                     this.statusMessage = "위치 파악 중…";
@@ -191,7 +171,7 @@
                     this.markers[i].setMap(null);
                 }
             },
-            searchLocationFood : function () {
+            geoLocationApi : function () {
                 let vm = this;
 
                 // 로딩 시작
@@ -204,8 +184,13 @@
                     vm.markers = [];
                 }
 
-                axios.get('api/searchLocationFood', {
+                let gridXY = vm.fnLatLon2XY(vm.latitude, vm.longitude);
+                console.log("격자 X:", gridXY.x, "격자 Y:", gridXY.y);
+
+                axios.get('api/geoLocationApi', {
                     params : {
+                        latitude : gridXY.x,
+                        longitude : gridXY.y,
                         x : vm.latitude,
                         y : vm.longitude
                     }
@@ -353,7 +338,6 @@
         async mounted() {
             await this.findMyLocation();
             this.getUserInfo();
-            this.geoLocationApi();
         }
     });
 </script>

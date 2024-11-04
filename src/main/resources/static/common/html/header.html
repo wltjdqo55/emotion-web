@@ -11,8 +11,6 @@
             <li class="account" @click="myPage()">
                 <i class="fas fa-user"></i>&nbsp; 계정 <!-- 사용자 아이콘 -->
                 <ul v-if="isUser">
-                    <li><a href="">마이페이지</a></li>
-                    <li><a href="">내 통계</a></li>
                     <li @click="logout()"><a href="">로그아웃</a></li>
                 </ul>
             </li>

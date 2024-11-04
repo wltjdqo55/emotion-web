@@ -34,8 +34,8 @@ public class WeatherData {
 
     StringBuilder urlBuilder = new StringBuilder(apiUrl);
     urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "="+serviceKey);
-    urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode(String.valueOf(x), "UTF-8")); //경도
-    urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode(String.valueOf(y), "UTF-8")); //위도
+    urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode(String.valueOf(x), "UTF-8")); //격자 X
+    urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode(String.valueOf(y), "UTF-8")); //격자 Y
     urlBuilder.append("&" + URLEncoder.encode("base_date","UTF-8") + "=" + URLEncoder.encode(baseDate, "UTF-8")); /* 조회하고싶은 날짜*/
     urlBuilder.append("&" + URLEncoder.encode("base_time","UTF-8") + "=" + URLEncoder.encode(baseTime, "UTF-8")); /* 조회하고싶은 시간*/
     urlBuilder.append("&" + URLEncoder.encode("dataType","UTF-8") + "=" + URLEncoder.encode(type, "UTF-8"));	/* 타입 */
@@ -48,7 +48,6 @@ public class WeatherData {
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setRequestMethod("GET");
     conn.setRequestProperty("Content-type", "application/json");
-//    System.out.println("Response code: " + conn.getResponseCode());
 
     BufferedReader rd;
     if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
@@ -66,7 +65,6 @@ public class WeatherData {
     rd.close();
     conn.disconnect();
     String result= sb.toString();
-    System.out.println("result=>" + result);
     //=======이 밑에 부터는 json에서 데이터 파싱해 오는 부분=====//
 
     // 결과가 비어있거나 에러 메시지를 포함하는 경우 null 반환
@@ -129,9 +127,19 @@ public class WeatherData {
 
       if ( category.equals("PTY") ) {
         if ( obsrValue.equals("0") ) {
-          map.put("precipitation", "normal");     // 적당한 날
-        } else {
-          map.put("precipitation", "rain");        // 비오는 날
+          map.put("precipitation", "없음");     
+        } else if ( obsrValue.equals("1") ){
+          map.put("precipitation", "비");        
+        } else if ( obsrValue.equals("2") ){
+          map.put("precipitation", "비/눈");
+        } else if ( obsrValue.equals("3") ){
+          map.put("precipitation", "눈");
+        } else if ( obsrValue.equals("5") ){
+          map.put("precipitation", "빗방울");
+        } else if ( obsrValue.equals("6") ){
+          map.put("precipitation", "빗방울눈날림");
+        } else if ( obsrValue.equals("7") ){
+          map.put("precipitation", "눈날림");
         }
       } else if ( category.equals("T1H") ) {
         map.put("temperature", obsrValue);

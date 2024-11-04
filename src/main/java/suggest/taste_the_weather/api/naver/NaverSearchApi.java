@@ -2,8 +2,6 @@ package suggest.taste_the_weather.api.naver;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import suggest.taste_the_weather.api.weather.WeatherData;
-import suggest.taste_the_weather.model.dto.WeatherDTO;
 import suggest.taste_the_weather.model.dto.naver.NaverSearchDTO;
 
 import java.io.*;
@@ -36,11 +34,11 @@ public class NaverSearchApi {
 
   String address = "";                        // 사용자가 위치한 지역
   HashMap<String, String> map = new HashMap<>();  // 날씨 정보를 담은 map
-  WeatherData weatherData = new WeatherData();
 
-  public ArrayList<NaverSearchDTO> searchLocationFood (JSONObject jsonData) throws IOException {
+  public ArrayList<NaverSearchDTO> searchLocationFood (JSONObject jsonData) {
     jsonParsing(jsonData);    // 데이터 파싱
     ArrayList<String> foodList = pickRandomFoods();
+
     System.out.println(foodList);
 
     ArrayList<NaverSearchDTO> naverSearchList = new ArrayList<>();
@@ -132,8 +130,8 @@ public class NaverSearchApi {
   }
 
   private ArrayList<String> pickRandomFoods () {
-    ArrayList<String> list = new ArrayList<>();
-
+    ArrayList<String> list;
+    list = getFoodList(rainFoods);
     if( map.containsKey("precipitation") ) {
       String precipitation = map.get( "precipitation" );
       String temperature = map.get("temperature");
@@ -152,7 +150,7 @@ public class NaverSearchApi {
     return list;
   }
 
-  public ArrayList<String> getFoodList ( String[] foodArray ) {   // 랜덤 음식 3가지 생성
+  public ArrayList<String> getFoodList ( String[] foodArray ) {   // 랜덤 음식 5가지 생성
 
     HashSet<Integer> pickedIndices = new HashSet<>();
     Random random = new Random();

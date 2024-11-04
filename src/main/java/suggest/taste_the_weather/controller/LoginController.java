@@ -69,7 +69,6 @@ public class LoginController {
   //카카오 로그인시 콜백 URL
   @GetMapping("/kakao/login/callback")
   public String kakaoCallback(@RequestParam("code") String code, HttpSession session) throws Exception {
-    System.out.println("code=>" + code);
 
     // 토큰 받기
     String accessToken = kakaoLoginService.getAccessToken(code);
@@ -80,6 +79,7 @@ public class LoginController {
     // 회원정보 가져오기
     UserDTO userDTO = kakaoLoginService.setUserInfo(String.valueOf(userInfo.get("id")), (String) userInfo.get("nickname"));
     userDTO.setToken(accessToken);
+
     // 세션 등록
     if(userDTO != null) {
       UserSession.setSession(userDTO, session, 3600);

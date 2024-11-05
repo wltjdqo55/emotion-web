@@ -104,6 +104,8 @@
 
 ## **🔲 음식 추천 Flow**
 
+&nbsp;
+
 <img src="https://github.com/user-attachments/assets/6bdd617e-c9be-403a-8b4b-c3e4b0ba8ada" alt="메인화면" style="display:inline-block; "/>
 
 #### 1. 메인화면 진입시 사용자 위치정보 요청 ( 위치정보 동의시 카카오맵 OPEN )
@@ -154,6 +156,10 @@
 - 동의하고 계속하기 클릭시 인가코드를 전달받고, 인가코드를 통해 토큰 발급
 - 응답코드로 받은 ID값이 DB에 존재하면 아이디 정보 불러오고, 없으면 DB에 등록 후 정보 가져옴
 - 카카오 메세지 API를 사용하기 위한 필수 조건
+
+&nbsp;
+
+&nbsp;
 
 <img src="https://github.com/user-attachments/assets/e3142280-0052-4831-b2a4-c68413daf765" alt="카카오 맵" style="display:inline-block; "/><br>
 <img src="https://github.com/user-attachments/assets/d40a0882-9be6-4183-a461-8d2239e88222" alt="검색음식점 정보" style="display:inline-block; "/>

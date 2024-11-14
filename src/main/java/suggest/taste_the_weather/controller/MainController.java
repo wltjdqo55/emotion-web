@@ -11,13 +11,13 @@ public class MainController {
   @GetMapping("/main")
   public String mainPage () {
     System.out.println("!!!");
-    return "/main";
+    return "main.html";
 //    return "/main.html";
   }
 
   @GetMapping("/login")
   public String loginPage ()  {
-    return "/account/login.html";
+    return "account/login";
   }
 
 

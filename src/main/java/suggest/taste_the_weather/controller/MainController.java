@@ -10,7 +10,9 @@ public class MainController {
 
   @GetMapping("/main")
   public String mainPage () {
-    return "/main.html";
+    System.out.println("!!!");
+    return "/main";
+//    return "/main.html";
   }
 
   @GetMapping("/login")

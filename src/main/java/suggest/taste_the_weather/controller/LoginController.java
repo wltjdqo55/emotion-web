@@ -69,7 +69,7 @@ public class LoginController {
   //카카오 로그인시 콜백 URL
   @GetMapping("/kakao/login/callback")
   public String kakaoCallback(@RequestParam("code") String code, HttpSession session) throws Exception {
-
+    System.out.println("@@@@@@@@@@@@@@@@@@@@@kakaologincallback");
     // 토큰 받기
     String accessToken = kakaoLoginService.getAccessToken(code);
 

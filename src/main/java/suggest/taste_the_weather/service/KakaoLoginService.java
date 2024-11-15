@@ -1,8 +1,11 @@
 package suggest.taste_the_weather.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import suggest.taste_the_weather.config.KakaoProperties;
 import suggest.taste_the_weather.model.dto.UserDTO;
 import suggest.taste_the_weather.model.entity.User;
 import suggest.taste_the_weather.model.vo.UserVO;
@@ -22,16 +25,15 @@ public class KakaoLoginService {
 
   private final AccountRepository accountRepository;
   private final AccountQueryDSL accountQueryDSL;
+  private final KakaoProperties kakaoProperties;
 
   String client_id = "a8eda776e6a96137d25561b1e5fe581a"; // 앱 키
   String response_type = "code";  // code로 고정
   String charset = "UTF-8";   // 인코딩 설정
-  String redirect_uri = "https://localhost:8443/kakao/login/callback"; // 전달받을 서비스 서버의 URI
 
   public String getKakaoAuthorizeUrl () throws UnsupportedEncodingException {
-
     // URL 인코딩
-    String encodedRedirectUri = URLEncoder.encode(redirect_uri, charset);
+    String encodedRedirectUri = URLEncoder.encode(kakaoProperties.getRedirectUri(), charset);
     String encodedClientId = URLEncoder.encode(client_id, charset);
 
     String apiUrl = "https://kauth.kakao.com/oauth/authorize?response_type=" + response_type + "&client_id=" + encodedClientId
@@ -58,7 +60,7 @@ public class KakaoLoginService {
       StringBuilder sb = new StringBuilder();
       sb.append("grant_type=authorization_code");
       sb.append("&client_id=").append(client_id);
-      sb.append("&redirect_uri=").append(redirect_uri);
+      sb.append("&redirect_uri=").append(kakaoProperties.getRedirectUri());
       sb.append("&code=").append(code);
 
       bw.write(sb.toString());

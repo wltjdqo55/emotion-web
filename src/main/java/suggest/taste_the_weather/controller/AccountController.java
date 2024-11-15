@@ -20,7 +20,7 @@ public class AccountController {
 
   @GetMapping("/join")
   public String join() {
-    return "/account/join.html";
+    return "account/join.html";
   }
 
   @GetMapping("/account/userIdCheck")

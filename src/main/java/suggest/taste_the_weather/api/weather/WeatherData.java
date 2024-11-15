@@ -193,24 +193,13 @@ public class WeatherData {
     for (int counter = 0; counter < reverseGeocodeResultArr.size(); counter++) {
       HashMap<String, Object> tmp = (HashMap<String, Object>) reverseGeocodeResultArr.get(counter);
       System.out.println("tmp = > " + tmp);
-      String level0 = (String) ((HashMap<String, Object>) tmp.get("structure")).get("level0");
-      String level1 = (String) ((HashMap<String, Object>) tmp.get("structure")).get("level1");
-      String level2 = (String) ((HashMap<String, Object>) tmp.get("structure")).get("level2");
       //주소 : 도, 시, 구, 동
-      address  = (String) tmp.get("text");
 
       if (tmp.get("type").equals("parcel")) {
         parcel_address = (String) tmp.get("text");
-        parcel_address = parcel_address.replace(level0, "").replace(level1, "").replace(level2, "").trim();
-      } else {
-        road_address = "도로 주소:" + (String) tmp.get("text");
-        road_address = road_address.replace(level0, "").replace(level1, "").replace(level2, "").trim();
+        break;
       }
     }
-
-    System.out.println("parcel_address = > " + parcel_address);
-    System.out.println("road_address = > " + road_address);
-
-    return address;
+    return parcel_address;
   }
 }

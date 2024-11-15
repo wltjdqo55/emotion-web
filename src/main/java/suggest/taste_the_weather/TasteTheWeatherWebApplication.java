@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 public class TasteTheWeatherWebApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("spring.profiles.default", "local");
 		SpringApplication.run(TasteTheWeatherWebApplication.class, args);
 	}
 

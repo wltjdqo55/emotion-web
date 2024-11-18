@@ -11,7 +11,7 @@ public class MainController {
   @GetMapping("/main")
   public String mainPage () {
     System.out.println("!!!");
-    return "main.html";
+    return "main";
 //    return "/main.html";
   }
 
